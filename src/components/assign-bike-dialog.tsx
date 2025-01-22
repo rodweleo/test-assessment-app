@@ -81,7 +81,9 @@ export const AssignBikeDialog = () => {
 
                             <CommandGroup heading="Available Bikes">
                                 {
-                                    availableBikes.map((bike) => (
+                                    availableBikes.filter((bike) => {
+                                        return bike.licenseplate.length > 0
+                                    }).map((bike) => (
                                         <CommandItem onSelect={() => setSelectedBike(bike.licenseplate)} className={`flex items-center w-full justify-between cursor-pointer ${selectedBike === (bike.licenseplate) ? 'bg-green-600 text-white' : null}`}>
                                             <div className="flex items-center gap-2">
                                                 <MdElectricBike />

@@ -105,7 +105,8 @@ VITE_MAPBOX_ACCESS_TOKEN=<your-mapbox-token>
 
 ## Deployment
 
-The application has been deployed for demonstration purposes. Access it here.
+The application has been deployed for demonstration purposes and accessible here: (https://the-greenwheels.vercel.app
+)
 
 - ## API Reference
   - Supabase is used to fetch and manage data from the assetLocation.csv and driverStatus.csv files.
@@ -138,5 +139,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 Rodwell Leo
 
 ```bash
-Let me know if you need any modifications or additional sections!
+Let me know if there is need for any modifications or additional features!
 ```

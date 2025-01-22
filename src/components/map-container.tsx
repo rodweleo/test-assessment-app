@@ -7,16 +7,17 @@ import { AssetLocation, BikeFilter } from '../utils/types';
 import { determineMovingState } from '../functions';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import BikePopupCard from './bike-pop-up-card';
-import ReactDOM from 'react-dom';
 import { MdElectricBike } from 'react-icons/md';
+import { renderReactToElement } from '../functions/renderReactToElement';
 
 interface MapProps {
     filters?: BikeFilter;
-    assetLocations?: AssetLocation[]
+    assetLocations?: AssetLocation[];
+    selectedBike?: string | null;
 }
 
 
-const MapContainer = ({ filters, assetLocations }: MapProps) => {
+const MapContainer = ({ filters, assetLocations, selectedBike }: MapProps) => {
 
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const map = useRef<mapboxgl.Map | null>(null);
@@ -45,7 +46,6 @@ const MapContainer = ({ filters, assetLocations }: MapProps) => {
 
     useEffect(() => {
         // if (!mapContainer.current) return;
-
         mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN!;
 
 
@@ -66,31 +66,6 @@ const MapContainer = ({ filters, assetLocations }: MapProps) => {
             console.log("Map is loaded")
         })
 
-        // mapInstanceRef.current.addControl(new mapboxgl.GeolocateControl({
-        //     positionOptions: {
-        //         enableHighAccuracy: true
-        //     },
-        //     trackUserLocation: true,
-        //     showUserHeading: true
-        // }));
-
-
-        // const positionOptions: PositionOptions = {
-        //     enableHighAccuracy: true,
-        //     maximumAge: 30000,
-        //     timeout: 27000
-        // }
-        // // Set user’s current location
-        // navigator.geolocation.watchPosition((position: GeolocationPosition) => {
-        //     const coordinates = {
-        //         latitude: position.coords.latitude,
-        //         longitude: position.coords.longitude
-        //     };
-        //     setUserCurrentPosition(coordinates);
-        // }, (error) => {
-        //     toast.error(`Sorry, no position available: ERROR(${error.code}): ${error.message}`)
-        // }, positionOptions);
-
         // Add markers for each bike
         // Clear existing markers
         markersRef.current.forEach(marker => marker.remove());
@@ -100,13 +75,9 @@ const MapContainer = ({ filters, assetLocations }: MapProps) => {
             if ((determineMovingState(asset.vehiclespeed) && filters?.moving) ||
                 (!determineMovingState(asset.vehiclespeed) && filters?.parked)) {
                 if (filters?.tripStatus[asset.tripstatus.toLowerCase() as keyof typeof filters.tripStatus]) {
-                    const bikePopupNode = document.createElement('div');
-                    ReactDOM.render(<BikePopupCard bike={asset} />, bikePopupNode);
-
+                    const bikePopupNode = renderReactToElement(<BikePopupCard bike={asset} />);
                     const color = getMarkerColor(asset);
-
-                    const markerElement = document.createElement('div');
-                    ReactDOM.render(<MdElectricBike size={40} color={color} />, markerElement);
+                    const markerElement = renderReactToElement(<MdElectricBike size={40} color={color} />);
 
                     const marker = new mapboxgl.Marker({
                         element: markerElement,
@@ -137,6 +108,22 @@ const MapContainer = ({ filters, assetLocations }: MapProps) => {
             }
         }
     }, [assetLocations, filters]);
+
+    useEffect(() => {
+        if (map.current && selectedBike && assetLocations) {
+            const selectedAsset = assetLocations.find(
+                (asset) => asset.licenseplate === selectedBike
+            );
+            if (selectedAsset) {
+                map.current.flyTo({
+                    center: [selectedAsset.lon, selectedAsset.lat],
+                    zoom: 14,
+                    essential: true,
+                });
+            }
+        }
+    }, [selectedBike, assetLocations]);
+
 
     return (
         <div className="relative h-full w-full">

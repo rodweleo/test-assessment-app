@@ -1,6 +1,6 @@
 
 import { Home, Users } from "lucide-react"
-import { Sidebar, SidebarGroupLabel, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroupContent } from "./ui/sidebar"
+import { Sidebar, SidebarHeader, SidebarGroupLabel, SidebarContent, SidebarGroup, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarGroupContent } from "./ui/sidebar"
 import { NavLink } from "react-router-dom";
 
 export const Navigation = () => {
@@ -21,6 +21,9 @@ export const Navigation = () => {
 
     return (
         <Sidebar>
+            <SidebarHeader className="p-4">
+                <img src="/logos/Green-Wheels-Logo_Horizontal.png" alt="GreenWheels" />
+            </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Application</SidebarGroupLabel>

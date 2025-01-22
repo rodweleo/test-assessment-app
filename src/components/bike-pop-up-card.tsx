@@ -20,10 +20,10 @@ const BikePopupCard: React.FC<BikePopupProps> = ({ bike }) => {
     return (
         <Card className="w-[300px] bg-white/95 backdrop-blur-sm shadow-lg border-none">
             <CardHeader className="p-4 pb-2">
-                <div className="w-full h-32 rounded-md overflow-hidden mb-2">
+                <div className="w-full h-auto rounded-md overflow-hidden mb-2">
                     <img
-                        src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d"
-                        alt="Bike"
+                        src="/images/GreenWheels Motorist.jpg"
+                        alt={bike.drivername}
                         className="w-full h-full object-cover"
                     />
                 </div>

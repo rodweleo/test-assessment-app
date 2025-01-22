@@ -3,22 +3,30 @@ import { Badge } from "./ui/badge"
 import { TableCell } from "./ui/table"
 import { MoreVertical, MapPin } from "lucide-react"
 import { Button } from "./ui/button"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { deactivateDriver } from "../functions/deactivateDriver"
 import toast from "react-hot-toast"
 import { activateDriver } from "../functions/activateDriver"
 import { useNavigate } from "react-router-dom"
+import { Driver } from "../utils/types"
+import { MdElectricBike } from "react-icons/md"
+import useAssignBikeModal from "@/hooks/use-assign-bike-modal"
+import { AssignBikeDialog } from "./assign-bike-dialog"
 
-export const DriversTableListItem = ({ driver, index }: {
-    driver: any,
+interface DriverTableListItemProps {
+    driver: Driver,
     index: number
-}) => {
+}
+
+export const DriversTableListItem = ({ driver, index }: DriverTableListItemProps) => {
 
     const navigate = useNavigate()
+    const { setOpen, setSelectedDriver } = useAssignBikeModal()
+    const queryClient = useQueryClient()
 
     const TOAST_ID = 'deactivate-driver-toast'
     const deactivateMutation = useMutation({
-        mutationFn: (driver) => {
+        mutationFn: (driver: Driver) => {
             return deactivateDriver(driver)
         },
         onMutate: () => {
@@ -26,6 +34,8 @@ export const DriversTableListItem = ({ driver, index }: {
         },
         onSuccess: () => {
             toast.success("Driver deactivated!", { id: TOAST_ID })
+            queryClient.invalidateQueries({ queryKey: ["bikes"] })
+            queryClient.invalidateQueries({ queryKey: ["drivers"] })
         },
         onError: () => {
             toast.error("An error occurred while deactivating the driver.", { id: TOAST_ID })
@@ -33,7 +43,7 @@ export const DriversTableListItem = ({ driver, index }: {
     })
 
     const activateMutation = useMutation({
-        mutationFn: (driver) => {
+        mutationFn: (driver: Driver) => {
             return activateDriver(driver)
         },
         onMutate: () => {
@@ -41,15 +51,13 @@ export const DriversTableListItem = ({ driver, index }: {
         },
         onSuccess: () => {
             toast.success("Driver activated!", { id: TOAST_ID })
+            queryClient.invalidateQueries({ queryKey: ["bikes"] })
+            queryClient.invalidateQueries({ queryKey: ["drivers"] })
         },
         onError: () => {
             toast.error("An error occurred while activating the driver.", { id: TOAST_ID })
         }
     })
-
-
-
-
 
     function getDriverStatus(status: string) {
         switch (status.toLowerCase()) {
@@ -63,7 +71,7 @@ export const DriversTableListItem = ({ driver, index }: {
     }
 
     const viewOnMap = () => {
-
+        navigate(`/?bike=${driver.licenseplate}`)
     };
 
     return (
@@ -80,18 +88,26 @@ export const DriversTableListItem = ({ driver, index }: {
                     <DropdownMenuContent className="flex flex-col w-full">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem><Button variant="secondary" className="w-full" onClick={() => viewOnMap()}> <MapPin /> VIEW ON MAP</Button></DropdownMenuItem>
+                        <DropdownMenuItem><Button variant="outline" className="w-full flex items-center justify-between" onClick={() => viewOnMap()}> <MapPin /> VIEW ON MAP</Button></DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Button variant="outline" className="w-full flex items-center justify-between" onClick={() => {
+                                setSelectedDriver(driver)
+                                setOpen(true)
+                            }}>
+                                <MdElectricBike className="mr-2" /> {driver.licenseplate.length === 0 ? "ASSIGN BIKE" : "CHANGE BIKE"}
+                            </Button>
+                        </DropdownMenuItem>
                         <DropdownMenuItem>
                             {
                                 driver.driverstatus.toLowerCase() === "active" ? <Button variant="destructive"
                                     onClick={() => {
-                                        deactivateMutation.mutate({ ...driver })
+                                        deactivateMutation.mutate(driver)
                                     }}
                                 >DEACTIVATE DRIVER</Button>
                                     :
                                     <Button className="bg-green-500 hover:bg-green-400"
                                         onClick={() => {
-                                            activateMutation.mutate({ ...driver })
+                                            activateMutation.mutate(driver)
                                         }}
                                     >ACTIVATE DRIVER</Button>
                             }
@@ -99,6 +115,7 @@ export const DriversTableListItem = ({ driver, index }: {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </TableCell>
+            <AssignBikeDialog />
         </>
     )
 }

@@ -35,14 +35,14 @@ const BikePopupCard: React.FC<BikePopupProps> = ({ bike }) => {
             <CardContent className="p-4 pt-2 space-y-2">
                 <div className="grid grid-cols-[20px_1fr] items-center gap-2">
                     <MdElectricBike className="w-4 h-4 text-muted-foreground" />
-                    <p className="text-sm">{bike.licenseplate}</p>
+                    <p className="text-sm">{bike.licenseplate.trim().length === 0 && "N/A"}</p>
                 </div>
 
                 <div className="grid grid-cols-[20px_1fr] items-center gap-2">
                     <FileText className="w-4 h-4 text-muted-foreground" />
                     <Badge className={`w-fit inline-flex items-center rounded-full px-2 py-1 font-medium
-              ${bike.tripstatus === 'ONLINE' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
-                            bike.tripstatus === 'ONTRIP' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' :
+              ${bike.tripstatus === 'ONLINE' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' :
+                            bike.tripstatus === 'ONTRIP' ? 'bg-green-100 text-green-700 hover:bg-green-200' :
                                 'bg-red-100 text-red-700 hover:bg-red-200'}`}>
                         {bike.tripstatus}
                     </Badge>
